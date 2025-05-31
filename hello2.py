@@ -1,6 +1,7 @@
 import os
 import chainlit as cl
 from agents import Agent,Runner, RunConfig, AsyncOpenAI, OpenAIChatCompletionsModel
+from openai.types.responses import ResponseTextDeltaEvent
 from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
@@ -32,29 +33,34 @@ agent1 = Agent(
     instructions="You are a helpful assistant that can answer the question"
 )
 
-# Step-5: Start chat
+# Step-5: Runner
 @cl.on_chat_start
-async def handle_chat_start(message: cl.Message):
+async def handle_chat_start():
     cl.user_session.set("history", [])
     await cl.Message(content="Hello! I am the Panaversity Support Agent. How i can help you today?").send()
 
-# Step-6: Runner              
 
 @cl.on_message
 async def handel_message(message: cl.Message):
     history =cl.user_session.get("history")
     
+    msg = cl.Message(content="")
+    await msg.send()
+    
     history.append({"role":"user", "content":message.content})
     
-    result = await Runner.run(
+    result = Runner.run_streamed(
         agent1,
         input=message.content,
         run_config=run_config
     )
+    async for event in result.stream_events():
+        if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
+            await msg.stream_token(event.data.delta)
+        
     history.append({"role":"assistant", "content": result.final_output})
     cl.user_session.set("history", history)
     
-   
-    await cl.Message(content=result.final_output).send()
+# await cl.Message(content=result.final_output).send()
 
 

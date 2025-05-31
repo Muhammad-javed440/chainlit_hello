@@ -8,7 +8,6 @@ load_dotenv(find_dotenv())
 
 HISTORY_FILE = "chat_history.json"  # File to store history
 gemini_api_key = os.getenv("GEMINI_API_KEY")
-
 # Step-1: Provider
 provider = AsyncOpenAI(
     api_key=gemini_api_key,
@@ -51,7 +50,7 @@ def save_history(history):
 async def handle_chat_start():
     history = load_history()
     cl.user_session.set("history", history)
-    await cl.Message(content="Hello! I am the Panaversity Support Agent. How can I help you today?").send()
+    await cl.Message(content="Hello! I am the universal Agent. How can I help you today?").send()
 
 @cl.on_message
 async def handle_message(message: cl.Message):

@@ -3,3 +3,4 @@ uv.lock
 .venv
 .chainlit
 __pycache__
+.gitignore
