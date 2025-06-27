@@ -44,7 +44,7 @@ async def handle_chat_start():
 async def handel_message(message: cl.Message):
     history =cl.user_session.get("history")
     
-    msg = cl.Message(content="")
+    msg = cl.Message(content="Processing your request...", author="Panaversity Support Agent")
     await msg.send()
     
     history.append({"role":"user", "content":message.content})
